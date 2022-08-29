@@ -1,14 +1,18 @@
 from torch import nn
+import timm
 
 
-class Pooling(nn.Module):
-    def __init__(self, in_ch, out_ch, img_size, bias):
+class Resnet(nn.Module):
+    def __init__(self, backbone, input, pretrained=True):
         super().__init__()
-        self.pool = nn.AdaptiveAvgPool2d(1)
-        self.conv = nn.Conv2d(in_ch, out_ch, 1, bias=bias)
-        self.bn = nn.BatchNorm2d(out_ch)
-        self.relu = nn.ReLU(inplace=True)
-        self.up = nn.UpsamplingBilinear2d(img_size)
+        assert backbone in timm.list_models('resnet*', pretrained=pretrained), backbone + ' is not supported!'
+        self.model = timm.create_model(backbone, in_chans=input, pretrained=pretrained, features_only=True)
+        for name, layer in self.model.layer4.named_modules():
+            if isinstance(layer, nn.Conv2d):
+                # name[0] is the block number
+                d = 2 ** (int(name[0]) + 1)
+                layer.stride = (1, 1)
+                layer.dilation = (d, d)
 
     def forward(self, x):
-        return self.up(self.relu(self.bn(self.conv(self.pool(x)))))
+        return self.model(x)
