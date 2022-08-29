@@ -1,2 +1,4 @@
 # pretrained-deeplab
-pre trained deeplab model with different backbone
+pre trained deeplab model with different backbones
+
+### coming soon!
