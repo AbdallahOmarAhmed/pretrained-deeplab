@@ -16,3 +16,13 @@ def Resnet(backbone, input, pretrained=True):
     return model
 
 
+if __name__ == '__main__':
+    backbone = input()
+    model = Resnet(backbone, 3, pretrained=False)
+    print(f'backbone: {backbone}')
+    print(f'output reduction: {model.feature_info.reduction()}')
+    x = torch.randn(1, 3, 256, 256)
+    print(f'input size: {x.shape}')
+    out = model(x)
+    print(f'output size: {out[0].shape, out[1].shape}')
+    print(model)
