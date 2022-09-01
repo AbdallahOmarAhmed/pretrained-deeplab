@@ -1,13 +1,13 @@
 # pretrained-deeplab
 pre trained deeplab model with different backbones
 ### supported backbones
-backbone | parametars | pretrained by timm | pretrained by us
-:--- | ---: | :---: | :---:
-resnet18 | N/A | yes | no
-resnet34 | N/A | yes | no
-resnet50 | N/A | yes | no
-resnet101 | N/A | yes | no
-resnet151 | N/A | yes | no
+backbone | pretrained | parametars
+:--- | :---: | ---:
+resnet18 | no |
+resnet34 | no |
+resnet50 | no |
+resnet101 | no |
+resnet151 | no |
 
 
 # Usage
