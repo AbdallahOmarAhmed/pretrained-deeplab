@@ -6,7 +6,7 @@ from torch import nn
 def Resnet(backbone, input, pretrained=True):
     assert backbone in timm.list_models('resnet*', pretrained=pretrained), backbone + ' is not supported!'
     model = timm.create_model(backbone, in_chans=input, pretrained=pretrained,
-                              features_only=True, output_stride=16, out_indices=(2, 4))
+                              features_only=True, output_stride=16, out_indices=(1, 4))
     for name, layer in model.layer4.named_modules():
         if isinstance(layer, nn.Conv2d):
             # name[0] is the block number
@@ -18,7 +18,7 @@ def Resnet(backbone, input, pretrained=True):
 
 def choose_backbone(backbone, input, pretrained=True):
     if backbone.startswith('resnet'):
-        return Resnet(backbone, input, pretrained=True)
+        return Resnet(backbone, input, pretrained=pretrained)
     else:
         raise Exception(backbone, "is not supported!")
 
