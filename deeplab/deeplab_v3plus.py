@@ -62,6 +62,6 @@ class DeepLabV3Plus(nn.Module):
 
 
 if __name__ == '__main__':
-    model = DeepLabV3Plus('resnet18', 3, 10, pretrained=False)
-    x = torch.randn(4, 3, 512, 512)
-    print(model(x).shape)
+    backbone = input()
+    model = DeepLabV3Plus(backbone, 3, 10, pretrained=False)
+    print(model.count_parameters())
