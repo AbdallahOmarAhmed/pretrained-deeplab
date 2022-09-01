@@ -46,9 +46,16 @@ class Decoder(nn.Module):
 
 
 class DeepLabV3Plus(nn.Module):
-    def __init__(self, backbone, input, num_classes, encoder_out=256, pretrained=True):
+    def __init__(self, backbone, input, num_classes, encoder_out=256, pretrained=None):
         super().__init__()
-        self.encoder = Encoder(backbone, input, encoder_out, pretrained)
+
+        # info
+        self.backbone = backbone
+        self.num_classes = num_classes
+        self.pretrained = pretrained == 'all'
+        self.backbone_pretrained = pretrained == 'backbone'
+
+        self.encoder = Encoder(backbone, input, encoder_out, self.backbone_pretrained)
         res_ch = self.encoder.res_channels()
         self.decoder = Decoder(num_classes, res_ch, encoder_out)
 
@@ -60,8 +67,17 @@ class DeepLabV3Plus(nn.Module):
     def count_parameters(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
+    def __str__(self):
+        print('backbone :', self.backbone)
+        print('parameters :', self.count_parameters())
+        print('number of classes :', self.num_classes)
+        if self.pretrained:
+            print('is pretrained : yes')
+        else:
+            print('backbone pretrained :', self.backbone_pretrained)
+            
 
 if __name__ == '__main__':
     backbone = input()
-    model = DeepLabV3Plus(backbone, 3, 10, pretrained=False)
+    model = DeepLabV3Plus(backbone, 3, 10)
     print(model.count_parameters())
