@@ -1,22 +1,24 @@
 import torch
 from torch import nn
+import torch.nn.functional as F
 
 
 class Pooling(nn.Module):
-    def __init__(self, in_ch, out_ch, img_size):
+    def __init__(self, in_ch, out_ch):
         super().__init__()
         self.pool = nn.AdaptiveAvgPool2d(1)
         self.conv = nn.Conv2d(in_ch, out_ch, 1, bias=False)
         self.bn = nn.BatchNorm2d(out_ch)
         self.relu = nn.ReLU(inplace=True)
-        self.up = nn.UpsamplingBilinear2d(img_size)
 
     def forward(self, x):
-        return self.up(self.relu(self.bn(self.conv(self.pool(x)))))
+        _, _, h, w = x.shape
+        x = self.relu(self.bn(self.conv(self.pool(x))))
+        return F.interpolate(x, size=(h, w), mode="bilinear", align_corners=False)
 
 
 class ASPP(nn.Module):
-    def __init__(self, in_ch, out_ch, img_size):
+    def __init__(self, in_ch, out_ch):
         super(ASPP, self).__init__()
         self.relu = nn.ReLU(inplace=True)
 
@@ -32,9 +34,8 @@ class ASPP(nn.Module):
         self.conv4 = nn.Conv2d(in_ch, out_ch, 3, dilation=18, padding='same', bias=False)
         self.bn4 = nn.BatchNorm2d(out_ch)
 
-        self.pool = Pooling(in_ch, out_ch, img_size)
+        self.pool = Pooling(in_ch, out_ch)
 
-        self.conv_end = nn.Conv2d(out_ch*5, out_ch, 1, bias=False)
         self.conv_end = nn.Conv2d(out_ch*5, out_ch, 1, bias=False)
         self.bn_end = nn.BatchNorm2d(out_ch)
 

@@ -16,9 +16,16 @@ def Resnet(backbone, input, pretrained=True):
     return model
 
 
+def choose_backbone(backbone, input, pretrained=True):
+    if backbone.startswith('resnet'):
+        return Resnet(backbone, input, pretrained=True)
+    else:
+        raise Exception(backbone, "is not supported!")
+
+
 if __name__ == '__main__':
     backbone = input()
-    model = Resnet(backbone, 3, pretrained=False)
+    model = choose_backbone(backbone, 3, pretrained=False)
     print(f'backbone: {backbone}')
     print(f'output reduction: {model.feature_info.reduction()}')
     x = torch.randn(1, 3, 256, 256)
