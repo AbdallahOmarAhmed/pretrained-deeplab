@@ -1,5 +1,5 @@
-from utils import *
-from backbones import choose_backbone
+from .utils import *
+from .backbones import choose_backbone
 import warnings
 warnings.filterwarnings("ignore")
 
