@@ -62,7 +62,7 @@ class DeepLabV3Plus(nn.Module):
 
         # decoder
         self.decoder = Decoder(num_classes, res_ch, encoder_out)
-        self.CRF(n_spatial_dims=2)
+        self.crf = CRF(n_spatial_dims=2)
 
     def forward(self, x):
         res, x = self.encoder(x)
