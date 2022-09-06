@@ -1,6 +1,7 @@
 from .utils import *
 from .backbones import choose_backbone
 import warnings
+from crfseg import CRF
 warnings.filterwarnings("ignore")
 
 
@@ -55,14 +56,21 @@ class DeepLabV3Plus(nn.Module):
         self.pretrained = pretrained == 'all'
         self.backbone_pretrained = pretrained == 'backbone'
 
+        # encoder
         self.encoder = Encoder(backbone, input, encoder_out, self.backbone_pretrained)
         res_ch = self.encoder.res_channels()
+
+        # decoder
         self.decoder = Decoder(num_classes, res_ch, encoder_out)
+        self.CRF(n_spatial_dims=2)
 
     def forward(self, x):
         res, x = self.encoder(x)
         out = self.decoder(res, x)
         return out
+
+    def crf(self, x):
+        return self.crf(x)
 
     def count_parameters(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
