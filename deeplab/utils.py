@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -46,3 +47,30 @@ class ASPP(nn.Module):
         x4 = self.relu(self.bn4(self.conv4(x)))
         x5 = self.pool(x)
         return self.relu(self.bn_end(self.conv_end(torch.cat([x1, x2, x3, x4, x5], dim=1))))
+
+
+def dice_loss(input, target):
+    assert input.size() == target.size(), "Input sizes must be equal."
+    assert input.dim() == 4, "Input must be a 4D Tensor."
+    uniques = np.unique(target.numpy())
+    assert set(list(uniques)) <= set([0, 1]), "target must only contain zeros and ones"
+
+    probs = F.softmax(input)
+    num = probs * target  # b,c,h,w--p*g
+    num = torch.sum(num, dim=3)  # b,c,h
+    num = torch.sum(num, dim=2)
+
+    den1 = probs * probs  # --p^2
+    den1 = torch.sum(den1, dim=3)  # b,c,h
+    den1 = torch.sum(den1, dim=2)
+
+    den2 = target * target  # --g^2
+    den2 = torch.sum(den2, dim=3)  # b,c,h
+    den2 = torch.sum(den2, dim=2)  # b,c
+
+    dice = 2 * (num / (den1 + den2))
+    dice_eso = dice[:, 1:]  # we ignore bg dice val, and take the fg
+
+    dice_total = -1 * torch.sum(dice_eso) / dice_eso.size(0)  # divide by batch_sz
+
+    return dice_total
